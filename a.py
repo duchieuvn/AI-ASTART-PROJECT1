@@ -1,5 +1,6 @@
 from PIL import Image
 import numpy as np
+import math as m
 
 def toMatrix(imagePath):
     img = Image.open(imagePath)
@@ -10,7 +11,7 @@ def toMatrix(imagePath):
     data = []
     temp = []
 
-    count = 0;
+    count = 0
     for row in range(height):
         for col in range(width):
             temp.append(rgba[count][0])
@@ -21,10 +22,28 @@ def toMatrix(imagePath):
 
     return data
 
+def sgn(x):
+    if (x < 0):
+        return -1
+    elif (x > 0):
+        return 1
+    else:
+        return 0
 
-data = toMatrix('map.bmp')
-data = np.array(data)
+class point:
+    def __init__(self,x,y):
+        self.x = x
+        self.y = y 
+        self.a = globalMap[x,y]
 
-print('matrix size: ', data.shape)
-print("first 10 values: ")
-print(data[0][:11])
+def gDistance(p1, pDest):
+    if (p1.a > pDest.a):
+        return m.sqrt((p1.x-pDest.x)**2 + (p1.y-pDest.y)**2) + 0.5*(p1.a-pDest.a)
+    else:
+        return m.sqrt((p1.x-pDest.x)**2 + (p1.y-pDest.y)**2) + 1.5*(pDest.a-p1.a) 
+
+data = toMatrix('ff.bmp')
+globalMap = np.array(data)
+
+print(globalMap[0][0], globalMap[0][1])
+print(gDistance(point(0,0), point(0,1)))
