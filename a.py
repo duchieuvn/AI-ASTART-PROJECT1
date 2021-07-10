@@ -2,6 +2,8 @@ from PIL import Image
 import numpy as np
 import math
 
+MAX = 999
+
 def toMatrix(imagePath):
     img = Image.open(imagePath)
     width, height = img.size
@@ -75,7 +77,8 @@ class pointFrontier:
     def __init__(self):
         self.list = []
         self.store = globalMap.copy()
-        self.store.fill(999)
+        self.store.fill(MAX)
+        self.count = 0
 
     def updateCost(self,p):
         if (p.parent == None):
@@ -86,6 +89,9 @@ class pointFrontier:
             p.total = p.cost + p.h1(globalG)
 
         if (p.total < self.store[p.y,p.x]):
+            if (self.store[p.y,p.x] == MAX):
+                self.count += 1
+
             self.store[p.y,p.x] = p.total
             return True
         
@@ -147,12 +153,18 @@ def tracePath(pG):
 
     return Path
 
+def drawPath(filePath, list):
+    img = Image.open(filePath)
+    for p in list:
+        img.putpixel((p.x,p.y), (255,0,0))
+    
+    img.save("out.bmp")
 
 def findAStart():
 
 
     f = pointFrontier()
-    start = point(1,1)
+    
     # push Start point to frontier
     f.updateCost(start)
     f.append(start)
@@ -160,40 +172,42 @@ def findAStart():
 
     print(f.store)
 
-    count = 0
-    while ((not isSame(curP, globalG)) and count < 100):
+    while ((not isSame(curP, globalG)) and f.count < 3000):
         for p in curP.adjList():
             if (curP.canClimb(p)):
                 p.parent = curP 
                 if (f.updateCost(p)):
-                    print("push (",p.x,p.y,")" )
+                    #print("push (",p.x,p.y,")" )
                     f.append(p)
-                    count += 1
-                    print("count:", count)
+
+                    # print("count:", f.count)
 
         #print(f.store)
-        print("frontier: ")
-        for item in f.list:
-            print(item.x, item.y,sep=',', end=' ')
-        print()
+        # print("frontier: ")
+        # for item in f.list:
+        #     print(item.x, item.y,sep=',', end=' ')
         curP = f.pop()
-        print("pop:" ,end=' ')
+        print("pop:" , end=" ")
         curP.display()
-        print()
 
 
-    print("points: ", count)
+    print("points: ", f.count)
     Path = tracePath(curP)
+
+    drawPath("ff.bmp",Path)
     
 
 
 #--------------------main---------------------
 
-data = toMatrix('ss.bmp')
+data = toMatrix('ff.bmp')
 globalMap = np.array(data)
 globalM = 10
-globalG = point(4,3)
+globalG = point(50,20)
 
+start = point(1,1)
+
+print(globalMap.shape)
 
 findAStart()
 
