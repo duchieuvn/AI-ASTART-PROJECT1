@@ -1,4 +1,5 @@
 
+from typing import Tuple
 from PIL import Image
 import numpy as np
 import math
@@ -75,14 +76,24 @@ def gDistance(p1, pDest):
 class pointFrontier:
     def __init__(self):
         self.list = []
+        self.store = globalMap.copy()
+        self.store.fill(999)
 
-    def append(self,p):
+    def updateCost(self,p):
         if (p.parent == None):
             p.cost = 0
             p.total = 0
         else:
-            p.cost = p.parent + gDistance(p.parent,p)
+            p.cost = p.parent.cost + gDistance(p.parent,p)
             p.total = p.cost + p.h1(globalG)
+
+        if (p.total < self.store[p.y,p.x]):
+            self.store[p.y,p.x] = p.total
+            return True
+        
+        return False
+
+    def append(self,p):
         
         # list dang rong~
         if (not self.list):
@@ -105,7 +116,7 @@ class pointFrontier:
         # ktra TH total = nhau tai day
         if (p.total == self.list[i].total):
             i += 1
-            while (p.total == self.list[i-1].total 
+            while (i > 0 and p.total == self.list[i-1].total 
                 and p.h1(globalG) > self.list[i-1].h1(globalG)):
                     i -= 1
             
@@ -126,38 +137,50 @@ class pointFrontier:
 
 
 def findAStart():
-    b = globalMap.copy()
+
 
     f = pointFrontier()
     start = point(1,1)
     # push Start point to frontier
+    f.updateCost(start)
     f.append(start)
     curP = f.pop()
+
+    print(f.store)
+
     count = 0
-    while ((not isSame(curP, globalG)) and count < 200):
+    while ((not isSame(curP, globalG)) and count < 100):
         for p in curP.adjList():
             if (curP.canClimb(p)):
                 p.parent = curP 
-                f.append(p)
-                count += 1
-        
-        curP = f.pop()
-        curP.display()
-        b[curP.y,curP.x] = 0
+                if (f.updateCost(p)):
+                    print("push (",p.x,p.y,")" )
+                    f.append(p)
+                    count += 1
+                    print("count:", count)
 
-    b[start.y,start.x] = -1
-    b[3,4] = -111
+        print(f.store)
+        print("frontier: ")
+        for item in f.list:
+            print(item.x, item.y,sep=',', end=' ')
+        print()
+        curP = f.pop()
+        print("pop:" ,end=' ')
+        curP.display()
+        print()
+
+
     print("points: ", count)
-    print(b)
     
 
 
 #--------------------main---------------------
 
 data = toMatrix('ss.bmp')
-d = data[:5][:5]
-globalMap = np.array(d)
+globalMap = np.array(data)
 globalM = 10
 globalG = point(4,3)
 
+
 findAStart()
+
