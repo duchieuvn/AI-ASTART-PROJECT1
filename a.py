@@ -133,6 +133,20 @@ class pointFrontier:
     def pop(self):
         return self.list.pop()
 
+def tracePath(pG):
+    print("total cost: ", pG.cost)
+    curP = pG
+    Path = []
+    while (curP.parent != None):
+        print(curP.x,curP.y,sep=',', end=' -> ')
+        Path.append(curP)
+        curP = curP.parent
+    
+    print(curP.x,curP.y,sep=',')
+    Path.append(curP)
+
+    return Path
+
 
 def findAStart():
 
@@ -157,7 +171,7 @@ def findAStart():
                     count += 1
                     print("count:", count)
 
-        print(f.store)
+        #print(f.store)
         print("frontier: ")
         for item in f.list:
             print(item.x, item.y,sep=',', end=' ')
@@ -169,6 +183,7 @@ def findAStart():
 
 
     print("points: ", count)
+    Path = tracePath(curP)
     
 
 
@@ -181,4 +196,5 @@ globalG = point(4,3)
 
 
 findAStart()
+
 
