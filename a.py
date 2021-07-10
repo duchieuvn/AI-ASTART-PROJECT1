@@ -99,11 +99,16 @@ class pointFrontier:
         i = len(self.list)-1
         self.list.append(self.list[-1])
         
-        while (i >= 0 and p > self.list[i]):
+        while (i >= 0 and p.total > self.list[i].total):
             i -= 1
 
         # ktra TH total = nhau tai day
-        if (p == self.list[i]):
+        if (p.total == self.list[i].total):
+            i += 1
+            while (p.total == self.list[i-1].total 
+                and p.h1(globalG) > self.list[i-1].h1(globalG)):
+                    i -= 1
+            
             for j in range(len(self.list)-1, i, -1):
                 self.list[j] = self.list[j-1]
             
