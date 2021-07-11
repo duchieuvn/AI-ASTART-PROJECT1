@@ -7,7 +7,6 @@ MAX = 999
 def toMatrix(imagePath):
     img = Image.open(imagePath)
     width, height = img.size
-    print()
     rgba = list(img.getdata())
 
     data = []
@@ -56,6 +55,7 @@ class point:
         a = (self.a - pGoal.a)**2
         b = (self.x - pGoal.x)**2 + (self.y - pGoal.y)**2
         return math.sqrt(a+b)
+        #return math.sqrt(b)
 
 def isSame(p1, p2):
     if (p1.x == p2.x and p1.y == p2.y):
@@ -68,10 +68,13 @@ def inBoard(x,y):
                 and x >= 0 and x < globalMap.shape[1]) 
 
 def gDistance(p1, pDest):
+
+    d = math.sqrt((p1.x-pDest.x)**2 + (p1.y-pDest.y)**2)
+
     if (p1.a > pDest.a):
-        return math.sqrt((p1.x-pDest.x)**2 + (p1.y-pDest.y)**2) + 0.5*(p1.a-pDest.a)
+        return d + 0.5*(p1.a-pDest.a)
     else:
-        return math.sqrt((p1.x-pDest.x)**2 + (p1.y-pDest.y)**2) + 1.5*(pDest.a-p1.a) 
+        return d + 1.5*(pDest.a-p1.a) 
 
 class pointFrontier:
     def __init__(self):
@@ -139,6 +142,7 @@ class pointFrontier:
     def pop(self):
         return self.list.pop()
 
+
 def tracePath(pG):
     print("total cost: ", pG.cost)
     curP = pG
@@ -153,15 +157,18 @@ def tracePath(pG):
 
     return Path
 
-def drawPath(filePath, list):
-    img = Image.open(filePath)
-    for p in list:
-        img.putpixel((p.x,p.y), (255,0,0))
-    
+def drawPath(img, pG):
+    #img = Image.open(filePath)
+    curP = pG 
+    while (curP.parent != None):
+        img.putpixel((curP.x,curP.y), (255,0,0))
+        curP = curP.parent
+
+    img.putpixel((curP.x,curP.y), (255,0,0))
     img.save("out.bmp")
 
-def findAStart():
-
+def findAStart(filePath):
+    img = Image.open(filePath) 
 
     f = pointFrontier()
     
@@ -170,45 +177,51 @@ def findAStart():
     f.append(start)
     curP = f.pop()
 
-    print(f.store)
+    reference = gDistance(start,globalG)
 
-    while ((not isSame(curP, globalG)) and f.count < 3000):
+    while ((not isSame(curP, globalG)) and f.count < 90000):
         for p in curP.adjList():
             if (curP.canClimb(p)):
                 p.parent = curP 
-                if (f.updateCost(p)):
+                if (f.updateCost(p) and p.h1(globalG) < reference):
                     #print("push (",p.x,p.y,")" )
                     f.append(p)
-
+                    img.putpixel((curP.x,curP.y), (0,255,0))
                     # print("count:", f.count)
 
-        #print(f.store)
+        # print(f.store[210:225,69:82], end='\n\n')
         # print("frontier: ")
         # for item in f.list:
         #     print(item.x, item.y,sep=',', end=' ')
+        #     print(int(item.total), end=' ')
+        #print()
         curP = f.pop()
-        print("pop:" , end=" ")
-        curP.display()
+        #print("pop:" , end=" ")
+        #curP.display()
 
+    #print(f.store)
 
     print("points: ", f.count)
-    Path = tracePath(curP)
+    print("cost:", curP.cost)
 
-    drawPath("ff.bmp",Path)
+    drawPath(img,curP)
     
 
 
 #--------------------main---------------------
 
-data = toMatrix('ff.bmp')
+filePath = "map.bmp"
+data = toMatrix(filePath)
 globalMap = np.array(data)
 globalM = 10
-globalG = point(50,20)
+globalG = point(96,311)
 
-start = point(1,1)
+start = point(74,213)
 
-print(globalMap.shape)
+print(globalMap.shape[1], globalMap.shape[0])
 
-findAStart()
+findAStart(filePath)
+
+
 
 
