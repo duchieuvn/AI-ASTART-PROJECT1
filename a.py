@@ -54,8 +54,9 @@ class point:
     def h1(self, pGoal):
         a = (self.a - pGoal.a)**2
         b = (self.x - pGoal.x)**2 + (self.y - pGoal.y)**2
-        #return math.sqrt(a+b)
-        return math.sqrt(b)
+        
+        return math.sqrt(a+b)
+        
 
 def isSame(p1, p2):
     if (p1.x == p2.x and p1.y == p2.y):
@@ -214,7 +215,7 @@ filePath = "map.bmp"
 data = toMatrix(filePath)
 globalMap = np.array(data)
 globalM = 10
-globalG = point(96,311)
+globalG = point(200,350)
 
 start = point(74,213)
 
