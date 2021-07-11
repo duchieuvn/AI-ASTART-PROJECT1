@@ -54,8 +54,9 @@ class point:
     def h1(self, pGoal):
         a = (self.a - pGoal.a)**2
         b = (self.x - pGoal.x)**2 + (self.y - pGoal.y)**2
-        return math.sqrt(a+b)
-        #return math.sqrt(b)
+        #return math.sqrt(a+b)
+        return 0
+        return math.sqrt(b)
 
 def isSame(p1, p2):
     if (p1.x == p2.x and p1.y == p2.y):
@@ -109,7 +110,7 @@ class pointFrontier:
         
 
         # neu p la min 
-        if (p.h1(globalG) < self.list[-1].h1(globalG)):
+        if (p.total < self.list[-1].total):
             self.list.append(p)
             return
 
@@ -117,14 +118,14 @@ class pointFrontier:
         i = len(self.list)-1
         self.list.append(self.list[-1])
         
-        while (i >= 0 and p.h1(globalG) > self.list[i].h1(globalG)):
+        while (i >= 0 and p.total > self.list[i].total):
             i -= 1
 
         # ktra TH total = nhau tai day
-        if (p.h1(globalG) == self.list[i].h1(globalG)):
+        if (p.total == self.list[i].total):
             i += 1
-            while (i > 0 and p.h1(globalG) == self.list[i-1].h1(globalG) 
-                and p.total > self.list[i-1].total):
+            while (i > 0 and p.total == self.list[i-1].total 
+                and p.h1(globalG) > self.list[i-1].h1(globalG)):
                     i -= 1
             
             for j in range(len(self.list)-1, i, -1):
@@ -183,18 +184,18 @@ def findAStart(filePath):
         for p in curP.adjList():
             if (curP.canClimb(p)):
                 p.parent = curP 
-                if (f.updateCost(p) and p.h1(globalG) < reference):
+                if (f.updateCost(p) ):
                     #print("push (",p.x,p.y,")" )
                     f.append(p)
                     img.putpixel((curP.x,curP.y), (0,255,0))
                     # print("count:", f.count)
 
-        print(f.store[210:225,69:82], end='\n\n')
-        print("frontier: ")
-        for item in f.list:
-            #print(item.x, item.y,sep=',', end=' ')
-            print(int(item.total), end=' ')
-        print()
+        # print(f.store[210:225,69:82], end='\n\n')
+        # print("frontier: ")
+        # for item in f.list:
+        #     print(item.x, item.y,sep=',', end=' ')
+        #     print(int(item.total), end=' ')
+        #print()
         curP = f.pop()
         #print("pop:" , end=" ")
         #curP.display()
@@ -220,7 +221,8 @@ start = point(74,213)
 
 print(globalMap.shape[1], globalMap.shape[0])
 
-findAStart(filePath)
+print(globalMap[0,:20])
+#findAStart(filePath)
 
 
 
