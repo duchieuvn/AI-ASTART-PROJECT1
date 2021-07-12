@@ -4,6 +4,7 @@ import math
 
 MAX = 999
 
+# convert image to matrix
 def toMatrix(imagePath):
     img = Image.open(imagePath)
     width, height = img.size
@@ -38,6 +39,7 @@ class point:
 
         return True
 
+    # accessible point
     def adjList(self):
         k = [[0,1],[0,-1],[1,0],[-1,0],
                 [1,1],[1,-1],[-1,1],[-1,-1]]
@@ -57,17 +59,20 @@ class point:
         
         return math.sqrt(a+b)
         
+    def h2(self,pGoal):
+      return math.sqrt((self.x-pGoal.x)**2 + (self.y-pGoal.y)**2)
 
 def isSame(p1, p2):
     if (p1.x == p2.x and p1.y == p2.y):
         return True
     
     return False
-
+# check a point is still in board
 def inBoard(x,y):
     return (y >= 0 and y < globalMap.shape[0] 
                 and x >= 0 and x < globalMap.shape[1]) 
 
+#
 def gDistance(p1, pDest):
 
     d = math.sqrt((p1.x-pDest.x)**2 + (p1.y-pDest.y)**2)
@@ -201,23 +206,50 @@ def findAStart(filePath):
         #curP.display()
 
     #print(f.store)
-
+    WriteFile(f.count,curP.cost)
     print("points: ", f.count)
     print("cost:", curP.cost)
 
     drawPath(img,curP)
     
+def Readfile(file):
+    input= open(file,"r")
+    res=[]
+    
+    for i in input:
+        res.append(i)
+    
+    for i in range(2):
+        a1= res[i].index("(")
+        a2=res[i].index(";")
+        a3=res[i].index(")")
+        x=int(res[i][a1+1:a2])
+        y=int(res[i][a2+1:a3])
+        point=[x,y]
+        res[i]=point
+    
+    res[2]=int(res[2])
+    return res
+
+def WriteFile(points,cost):
+    output= open(OutputTextFile,"w")
+    output.write(str(cost)+"\n")
+    output.write(str(points))
 
 
 #--------------------main---------------------
+InputTextFile = "E:\\HK6\\NMAI\\Project1\\AI-ASTART-PROJECT1\\input.txt"
+OutputTextFile= InputTextFile.replace("input","output")
+
+res=Readfile(InputTextFile)
 
 filePath = "map.bmp"
 data = toMatrix(filePath)
 globalMap = np.array(data)
-globalM = 10
-globalG = point(200,350)
+globalM=res[2]
+globalG = point(res[0][0],res[0][1])
 
-start = point(74,213)
+start = point(res[1][0],res[1][1])
 
 print(globalMap.shape[1], globalMap.shape[0])
 

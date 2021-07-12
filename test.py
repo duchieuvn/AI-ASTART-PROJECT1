@@ -210,19 +210,21 @@ def findAStart(filePath):
 
 #--------------------main---------------------
 
-filePath = "map.bmp"
-data = toMatrix(filePath)
+InputFilePath = "E:\\HK6\\NMAI\\Project1\\AI-ASTART-PROJECT1\\map.bmp"
+OutputFilepath=InputFilePath.replace(".bmp","1.bmp")
+
+data = toMatrix(InputFilePath)
 globalMap = np.array(data)
 globalM = 10
 globalG = point(96,311)
 
-start = point(74,213)
+start = point(0,2)
 
 print(globalMap.shape[1], globalMap.shape[0])
 
 print(globalMap[0,:20])
 
-findAStart(filePath)
+findAStart(InputFilePath)
 
 
 
