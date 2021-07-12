@@ -72,7 +72,7 @@ def inBoard(x,y):
     return (y >= 0 and y < globalMap.shape[0] 
                 and x >= 0 and x < globalMap.shape[1]) 
 
-#
+
 def gDistance(p1, pDest):
 
     d = math.sqrt((p1.x-pDest.x)**2 + (p1.y-pDest.y)**2)
@@ -247,9 +247,9 @@ filePath = "map.bmp"
 data = toMatrix(filePath)
 globalMap = np.array(data)
 globalM=res[2]
-globalG = point(res[0][0],res[0][1])
+globalG = point(res[1][0],res[1][1])
 
-start = point(res[1][0],res[1][1])
+start = point(res[0][0],res[0][1])
 
 print(globalMap.shape[1], globalMap.shape[0])
 
