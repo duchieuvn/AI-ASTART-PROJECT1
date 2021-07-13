@@ -163,7 +163,7 @@ def tracePath(pG):
 
     return Path
 
-def drawPath(img, pG):
+def drawPath(img, pG,i):
     #img = Image.open(filePath)
     curP = pG 
     while (curP.parent != None):
@@ -171,9 +171,10 @@ def drawPath(img, pG):
         curP = curP.parent
 
     img.putpixel((curP.x,curP.y), (255,0,0))
-    img.save("out.bmp")
+    output=filePath.replace(".bmp",str(i+1)+".bmp")
+    img.save(output)
 
-def findAStart(filePath):
+def findAStart(filePath,i):
     img = Image.open(filePath) 
 
     f = pointFrontier()
@@ -189,11 +190,18 @@ def findAStart(filePath):
         for p in curP.adjList():
             if (curP.canClimb(p)):
                 p.parent = curP 
-                if (f.updateCost(p) and p.h1(globalG) < reference):
-                    #print("push (",p.x,p.y,")" )
-                    f.append(p)
-                    img.putpixel((curP.x,curP.y), (0,255,0))
-                    # print("count:", f.count)
+                if i==0:
+                    if (f.updateCost(p) and p.h1(globalG) < reference):
+                        #print("push (",p.x,p.y,")" )
+                        f.append(p)
+                        img.putpixel((curP.x,curP.y), (0,255,0))
+                        # print("count:", f.count)
+                if i==1:
+                    if (f.updateCost(p) and p.h2(globalG) < reference):
+                        #print("push (",p.x,p.y,")" )
+                        f.append(p)
+                        img.putpixel((curP.x,curP.y), (0,255,0))
+                        # print("count:", f.count)
 
         # print(f.store[210:225,69:82], end='\n\n')
         # print("frontier: ")
@@ -206,11 +214,11 @@ def findAStart(filePath):
         #curP.display()
 
     #print(f.store)
-    WriteFile(f.count,curP.cost)
+    WriteFile(f.count,curP.cost,i)
     print("points: ", f.count)
     print("cost:", curP.cost)
 
-    drawPath(img,curP)
+    drawPath(img,curP,i)
     
 def Readfile(file):
     input= open(file,"r")
@@ -231,15 +239,16 @@ def Readfile(file):
     res[2]=int(res[2])
     return res
 
-def WriteFile(points,cost):
+def WriteFile(points,cost,i):
+    OutputTextFile=InputTextFile.replace("input","output"+str(i+1))
     output= open(OutputTextFile,"w")
     output.write(str(cost)+"\n")
     output.write(str(points))
 
 
 #--------------------main---------------------
-InputTextFile = "E:\\HK6\\NMAI\\Project1\\AI-ASTART-PROJECT1\\input.txt"
-OutputTextFile= InputTextFile.replace("input","output")
+InputTextFile = "input.txt"
+
 
 res=Readfile(InputTextFile)
 
@@ -253,7 +262,8 @@ start = point(res[0][0],res[0][1])
 
 print(globalMap.shape[1], globalMap.shape[0])
 
-findAStart(filePath)
+for i in range(2):
+    findAStart(filePath,i)
 
 
 
