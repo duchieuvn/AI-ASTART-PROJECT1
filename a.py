@@ -53,20 +53,34 @@ class point:
     def display(self):
         print("(",self.x,",",self.y,")")
 
-    def h1(self, pGoal):
-        a = (self.a - pGoal.a)**2
+    def h(self, pGoal, i):
+        
         b = (self.x - pGoal.x)**2 + (self.y - pGoal.y)**2
+        if (i == 1):    
+            a = (self.a - pGoal.a)**2
+            return math.sqrt(a+b)
+        if (i==2):
+            return math.sqrt(b)
+        if (i==3):
+            X = [min(self.x, pGoal.x), max(self.x, pGoal.x)]
+            Y = [min(self.y, pGoal.y), max(self.y, pGoal.y)]
+            count = (X[1] - X[0] + 1) * (Y[1] - Y[0] +1) 
+            avg = 0
+            for row in range(Y[0],Y[1]+1):
+                for col in range(X[0], X[1]+1):
+                    avg += globalMap[row,col]
+
+            avg = avg / count
+            a = (self.a - avg)**2
+            return math.sqrt(a+b)
         
-        return math.sqrt(a+b)
-        
-    def h2(self,pGoal):
-      return math.sqrt((self.x-pGoal.x)**2 + (self.y-pGoal.y)**2)
 
 def isSame(p1, p2):
     if (p1.x == p2.x and p1.y == p2.y):
         return True
     
     return False
+
 # check a point is still in board
 def inBoard(x,y):
     return (y >= 0 and y < globalMap.shape[0] 
@@ -83,11 +97,12 @@ def gDistance(p1, pDest):
         return d + 1.5*(pDest.a-p1.a) 
 
 class pointFrontier:
-    def __init__(self):
+    def __init__(self, i):
         self.list = []
         self.store = globalMap.copy()
         self.store.fill(MAX)
         self.count = 0
+        self.hType = i
 
     def updateCost(self,p):
         if (p.parent == None):
@@ -95,7 +110,7 @@ class pointFrontier:
             p.total = 0
         else:
             p.cost = p.parent.cost + gDistance(p.parent,p)
-            p.total = p.cost + p.h1(globalG)
+            p.total = p.cost + p.h(globalG,self.hType)
 
         if (p.total < self.store[p.y,p.x]):
             if (self.store[p.y,p.x] == MAX):
@@ -113,13 +128,11 @@ class pointFrontier:
             self.list.append(p)
             return
         
-
         # neu p la min 
         if (p.total < self.list[-1].total):
             self.list.append(p)
             return
 
-        
         i = len(self.list)-1
         self.list.append(self.list[-1])
         
@@ -130,7 +143,7 @@ class pointFrontier:
         if (p.total == self.list[i].total):
             i += 1
             while (i > 0 and p.total == self.list[i-1].total 
-                and p.h1(globalG) > self.list[i-1].h1(globalG)):
+                and p.h(globalG,self.hType) > self.list[i-1].h(globalG,self.hType)):
                     i -= 1
             
             for j in range(len(self.list)-1, i, -1):
@@ -146,6 +159,8 @@ class pointFrontier:
         self.list[i+1] = p
 
     def pop(self):
+        if (len(self.list) == 0):
+            return None
         return self.list.pop()
 
 
@@ -171,13 +186,13 @@ def drawPath(img, pG,i):
         curP = curP.parent
 
     img.putpixel((curP.x,curP.y), (255,0,0))
-    output=filePath.replace(".bmp",str(i+1)+".bmp")
+    output=filePath.replace(".bmp",str(i)+".bmp")
     img.save(output)
 
 def findAStart(filePath,i):
     img = Image.open(filePath) 
 
-    f = pointFrontier()
+    f = pointFrontier(i)
     
     # push Start point to frontier
     f.updateCost(start)
@@ -190,18 +205,9 @@ def findAStart(filePath,i):
         for p in curP.adjList():
             if (curP.canClimb(p)):
                 p.parent = curP 
-                if i==0:
-                    if (f.updateCost(p) and p.h1(globalG) < reference):
-                        #print("push (",p.x,p.y,")" )
-                        f.append(p)
-                        img.putpixel((curP.x,curP.y), (0,255,0))
-                        # print("count:", f.count)
-                if i==1:
-                    if (f.updateCost(p) and p.h2(globalG) < reference):
-                        #print("push (",p.x,p.y,")" )
-                        f.append(p)
-                        img.putpixel((curP.x,curP.y), (0,255,0))
-                        # print("count:", f.count)
+                if (f.updateCost(p) and p.h(globalG,f.hType) < reference):
+                    f.append(p)
+                    img.putpixel((curP.x,curP.y), (0,255,0))
 
         # print(f.store[210:225,69:82], end='\n\n')
         # print("frontier: ")
@@ -240,7 +246,7 @@ def Readfile(file):
     return res
 
 def WriteFile(points,cost,i):
-    OutputTextFile=InputTextFile.replace("input","output"+str(i+1))
+    OutputTextFile=InputTextFile.replace("input","output"+str(i))
     output= open(OutputTextFile,"w")
     output.write(str(cost)+"\n")
     output.write(str(points))
@@ -262,8 +268,8 @@ start = point(res[0][0],res[0][1])
 
 print(globalMap.shape[1], globalMap.shape[0])
 
-for i in range(2):
-    findAStart(filePath,i)
+
+findAStart(filePath,3)
 
 
 
