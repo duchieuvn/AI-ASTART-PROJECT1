@@ -62,20 +62,13 @@ class point:
         if (i==2):
             return math.sqrt(b)
         if (i==3):
-            X = [min(self.x, pGoal.x), max(self.x, pGoal.x)]
-            Y = [min(self.y, pGoal.y), max(self.y, pGoal.y)]
-            count = (X[1] - X[0] + 1) * (Y[1] - Y[0] +1) 
-            avg = 0
-            for row in range(Y[0],Y[1]+1):
-                for col in range(X[0], X[1]+1):
-                    avg += globalMap[row,col]
-
-            avg = avg / count
-            a = (self.a - avg)**2
-            return math.sqrt(a+b)
+            a = abs(self.a - pGoal.a)
+            return math.sqrt(b) + a
+            
         
 
 def isSame(p1, p2):
+    
     if (p1.x == p2.x and p1.y == p2.y):
         return True
     
@@ -189,6 +182,14 @@ def drawPath(img, pG,i):
     output=filePath.replace(".bmp",str(i)+".bmp")
     img.save(output)
 
+def ref(i):
+    d = math.sqrt((start.x-globalG.x)**2 + (start.y-globalG.y)**2)
+    
+    if (i != 3):
+        return d + 15
+
+    return d + abs(start.a - globalG.a)
+
 def findAStart(filePath,i):
     img = Image.open(filePath) 
 
@@ -199,7 +200,7 @@ def findAStart(filePath,i):
     f.append(start)
     curP = f.pop()
 
-    reference = gDistance(start,globalG)
+    reference = ref(i)
 
     while ((not isSame(curP, globalG)) and f.count < 90000):
         for p in curP.adjList():
@@ -216,6 +217,9 @@ def findAStart(filePath,i):
         #     print(int(item.total), end=' ')
         #print()
         curP = f.pop()
+        if (curP == None):
+            print("No way")
+            return
         #print("pop:" , end=" ")
         #curP.display()
 
@@ -269,7 +273,8 @@ start = point(res[0][0],res[0][1])
 print(globalMap.shape[1], globalMap.shape[0])
 
 
-findAStart(filePath,3)
+for i in range(1,4):
+    findAStart(filePath, i)
 
 
 
