@@ -2,7 +2,7 @@ from PIL import Image
 import numpy as np
 import math
 
-MAX = 999
+MAX = 99999
 
 # convert image to matrix
 def toMatrix(imagePath):
@@ -29,8 +29,8 @@ class point:
         self.x = x
         self.y = y 
         self.a = globalMap[y,x]
-        self.cost = 999
-        self.total = 999
+        self.cost = MAX
+        self.total = MAX
         self.parent = None
 
     def canClimb(self, p):
@@ -202,6 +202,7 @@ def findAStart(filePath,i):
 
     reference = ref(i)
 
+
     while ((not isSame(curP, globalG)) and f.count < 900000):
         for p in curP.adjList():
             if (curP.canClimb(p)):
@@ -218,6 +219,7 @@ def findAStart(filePath,i):
         #print()
         curP = f.pop()
         if (curP == None):
+            print("points: ", f.count)
             print("No way")
             return
         #print("pop:" , end=" ")
@@ -274,7 +276,7 @@ print(globalMap.shape[1], globalMap.shape[0])
 
 
 
-for i in range(1,4):
+for i in range(1,2):
     findAStart(filePath, i)
 
 
