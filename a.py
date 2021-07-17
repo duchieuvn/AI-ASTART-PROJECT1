@@ -64,6 +64,8 @@ class point:
         if (i==3):
             a = abs(self.a - pGoal.a)
             return math.sqrt(b) + a
+        if (i==4):
+            return 0
             
         
 
@@ -201,15 +203,15 @@ def findAStart(filePath,i):
     curP = f.pop()
 
     reference = ref(i)
+    val= globalMap.shape[0]*globalMap.shape[1]
 
-
-    while ((not isSame(curP, globalG)) and f.count < 900000):
+    while ((not isSame(curP, globalG)) and f.count < val):
         for p in curP.adjList():
             if (curP.canClimb(p)):
                 p.parent = curP 
                 if (f.updateCost(p) and p.h(globalG,f.hType) < reference):
                     f.append(p)
-                    img.putpixel((curP.x,curP.y), (0,255,0))
+                    #img.putpixel((curP.x,curP.y), (0,255,0))
 
         # print(f.store[210:225,69:82], end='\n\n')
         # print("frontier: ")
@@ -227,6 +229,7 @@ def findAStart(filePath,i):
 
     #print(f.store)
     WriteFile(f.count,curP.cost,i)
+    print("heuristic ",i)
     print("points: ", f.count)
     print("cost:", curP.cost)
 
@@ -276,7 +279,7 @@ print(globalMap.shape[1], globalMap.shape[0])
 
 
 
-for i in range(1,2):
+for i in range(1,5):
     findAStart(filePath, i)
 
 
