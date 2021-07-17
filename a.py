@@ -202,7 +202,7 @@ def findAStart(filePath,i):
 
     reference = ref(i)
 
-    while ((not isSame(curP, globalG)) and f.count < 90000):
+    while ((not isSame(curP, globalG)) and f.count < 900000):
         for p in curP.adjList():
             if (curP.canClimb(p)):
                 p.parent = curP 
@@ -271,6 +271,7 @@ globalG = point(res[1][0],res[1][1])
 start = point(res[0][0],res[0][1])
 
 print(globalMap.shape[1], globalMap.shape[0])
+
 
 
 for i in range(1,4):
